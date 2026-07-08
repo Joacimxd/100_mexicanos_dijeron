@@ -1,0 +1,124 @@
+{
+  "questions": [
+    {
+      "question": "A movie monster you would absolutely not want to be trapped in an elevator with",
+      "answers": [
+        { "text": "Alien / Xenomorph", "points": 35 },
+        { "text": "Freddy Krueger", "points": 25 },
+        { "text": "Pennywise the Clown", "points": 18 },
+        { "text": "Godzilla", "points": 12 },
+        { "text": "Jason Voorhees", "points": 10 }
+      ]
+    },
+    {
+      "question": "Something people do while singing in the shower",
+      "answers": [
+        { "text": "Use the shampoo bottle as a microphone", "points": 42 },
+        { "text": "Give a concert to an imaginary audience", "points": 28 },
+        { "text": "Make a soap mohawk hair style", "points": 15 },
+        { "text": "Forget the lyrics and make them up", "points": 10 },
+        { "text": "Dance and slip", "points": 5 }
+      ]
+    },
+    {
+      "question": "Name a famous superhero group from pop culture",
+      "answers": [
+        { "text": "The Avengers", "points": 50 },
+        { "text": "The Justice League", "points": 25 },
+        { "text": "X-Men", "points": 13 },
+        { "text": "Teen Titans", "points": 8 },
+        { "text": "Fantastic Four", "points": 4 }
+      ]
+    },
+    {
+      "question": "Something that makes a movie theater experience completely unbearable",
+      "answers": [
+        { "text": "People talking loudly", "points": 40 },
+        { "text": "Someone kicking your seat", "points": 26 },
+        { "text": "Bright phone screens glowing", "points": 18 },
+        { "text": "Loud chewing or crunching noises", "points": 11 },
+        { "text": "Someone spoiling the ending", "points": 5 }
+      ]
+    },
+    {
+      "question": "The ultimate comfort food to eat while binge-watching a TV show",
+      "answers": [
+        { "text": "Pizza", "points": 45 },
+        { "text": "Popcorn", "points": 25 },
+        { "text": "Ice cream", "points": 15 },
+        { "text": "Potato chips", "points": 10 },
+        { "text": "Burgers", "points": 5 }
+      ]
+    },
+    {
+      "question": "A superpower that sounds great but would actually be super annoying in real life",
+      "answers": [
+        { "text": "Mind reading (hearing everyone's dark thoughts)", "points": 38 },
+        { "text": "Invisibility (bumping into everyone)", "points": 24 },
+        { "text": "Super hearing (never getting any sleep)", "points": 18 },
+        { "text": "Flight (getting bugs in your mouth)", "points": 12 },
+        { "text": "Super strength (breaking everything you touch)", "points": 8 }
+      ]
+    },
+    {
+      "question": "Name an iconic video game franchise known worldwide",
+      "answers": [
+        { "text": "Super Mario", "points": 40 },
+        { "text": "Grand Theft Auto (GTA)", "points": 28 },
+        { "text": "Minecraft", "points": 15 },
+        { "text": "Pokémon", "points": 12 },
+        { "text": "Call of Duty", "points": 5 }
+      ]
+    },
+    {
+      "question": "Something people do to pretend they are busy when they see an awkward acquaintance in public",
+      "answers": [
+        { "text": "Stare intensely at their phone screen", "points": 48 },
+        { "text": "Put on headphones instantly", "points": 22 },
+        { "text": "Pretend to read a label in a store", "points": 14 },
+        { "text": "Turn around and walk the other way", "points": 11 },
+        { "text": "Fling their keys or look for something in a bag", "points": 5 }
+      ]
+    },
+    {
+      "question": "A fictional place from movies or books that everyone wishes they could visit",
+      "answers": [
+        { "text": "Hogwarts", "points": 45 },
+        { "text": "Wakanda", "points": 22 },
+        { "text": "The Mushroom Kingdom", "points": 15 },
+        { "text": "Middle-earth / The Shire", "points": 11 },
+        { "text": "Bikini Bottom", "points": 7 }
+      ]
+    },
+    {
+      "question": "Something that always happens to characters in a horror movie when they are running away",
+      "answers": [
+        { "text": "They trip and fall over absolutely nothing", "points": 52 },
+        { "text": "The car keys drop or the engine won't start", "points": 25 },
+        { "text": "They run upstairs instead of out the front door", "points": 12 },
+        { "text": "Their phone has zero signal", "points": 8 },
+        { "text": "They hide in a terrible spot like a closet", "points": 3 }
+      ]
+    },
+    {
+      "question": "A genre of music you probably wouldn't play at a high-energy party",
+      "answers": [
+        { "text": "Classical music", "points": 42 },
+        { "text": "Country", "points": 25 },
+        { "text": "Jazz", "points": 16 },
+        { "text": "Heavy Metal", "points": 12 },
+        { "text": "Lo-fi / Ambient chill", "points": 5 }
+      ]
+    },
+    {
+      "question": "An unwritten rule of using public transportation or elevators",
+      "answers": [
+        { "text": "Don't make eye contact with strangers", "points": 38 },
+        { "text": "Let people exit before you try to get on", "points": 30 },
+        { "text": "Keep your music / videos on mute", "points": 18 },
+        { "text": "Leave a one-seat gap if possible", "points": 10 },
+        { "text": "Face the door, not the other people", "points": 4 }
+      ]
+    }
+  ]
+}

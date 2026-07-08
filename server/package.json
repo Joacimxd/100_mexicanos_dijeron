@@ -1,0 +1,14 @@
+{
+  "name": "100-mexicanos-server",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "ws": "^8.18.0",
+    "cors": "^2.8.5"
+  }
+}
