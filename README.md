@@ -9,14 +9,15 @@ A web-based recreation of the classic TV game show "100 Mexicanos Dijeron" (Fami
 The application is split into two parts: a **board** (displayed on a shared screen) and a **controller** (used from a phone or secondary device). Both communicate in real time through WebSockets over your local network.
 
 1. The host opens the app and displays the **Board** view on a TV or projector.
-2. Players scan the QR code shown on screen (or navigate to the local network URL) to open the **Controller** on their phones.
-3. The host uses the controller to reveal answers, give strikes, award points, and advance through questions.
+2. The host uses the controller to reveal answers, give strikes, award points, and advance through questions.
 
 ### Board View
 
 The board shows the current question's answer slots, team scores, and round points. When an answer is revealed, it animates into view with a sound effect. Strikes appear as large red X marks overlaid on screen. Scoring triggers a flashing light celebration effect.
 
 ![Board Screen](screenshots/board_screen.png)
+
+![Strike Screen](screenshots/strike_screen.png)
 
 ### Controller View
 
