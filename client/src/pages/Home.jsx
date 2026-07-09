@@ -2,18 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function QRModal({ url, onClose }) {
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(url)}&bgcolor=0a0e27&color=f5c842&format=svg`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(url)}&color=000000&bgcolor=ffffff&format=svg&margin=0`;
 
   return (
     <div className="qr-modal-overlay" onClick={onClose}>
       <div className="qr-modal" onClick={(e) => e.stopPropagation()}>
         <button className="qr-close-btn" onClick={onClose}>✕</button>
-        <h3 className="qr-title">Escanea con tu teléfono</h3>
         <div className="qr-code-container">
           <img src={qrUrl} alt="QR Code" className="qr-image" />
         </div>
-        <p className="qr-url">{url}</p>
-        <p className="qr-hint">Abre la cámara de tu teléfono y apunta al código QR</p>
       </div>
     </div>
   );
@@ -36,7 +33,7 @@ export default function Home() {
       playPromise.catch(() => {
         // Autoplay blocked, wait for user interaction
         const playOnInteract = () => {
-          homeSound.play();
+          homeSound.play().catch(() => {});
           document.removeEventListener('click', playOnInteract);
         };
         document.addEventListener('click', playOnInteract);
@@ -76,17 +73,20 @@ export default function Home() {
   return (
     <div className="home-container">
       {/* Top Right QR Button */}
-      <button
-        className="home-top-qr-btn"
-        onClick={() => handleShowQR('/')}
-        disabled={loading}
-        title="Compartir enlace de red"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-        </svg>
-        <span>QR</span>
-      </button>
+      <div style={{ position: 'absolute', top: '32px', right: '32px', display: 'flex', gap: '16px', zIndex: 10 }}>
+        <button
+          className="home-top-qr-btn"
+          style={{ position: 'static' }}
+          onClick={() => handleShowQR('/')}
+          disabled={loading}
+          title="Compartir enlace de red"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+          </svg>
+          <span>QR</span>
+        </button>
+      </div>
 
       {/* SVG Image Buttons */}
       <div className="home-buttons-grid">

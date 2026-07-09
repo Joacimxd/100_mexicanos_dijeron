@@ -112,7 +112,7 @@ export default function Board() {
     if ((anims.team1 || anims.team2) && !isFirstRender.current) {
       setScoreAnimating(anims);
       playSound(sounds.points);
-      setTimeout(() => setScoreAnimating({ team1: false, team2: false }), 600);
+      setTimeout(() => setScoreAnimating({ team1: false, team2: false }), 4000);
     }
 
     setPrevScores({ ...gameState.scores });
@@ -160,12 +160,13 @@ export default function Board() {
 
   const currentQ = gameState.questions[gameState.currentQuestionIndex];
   const answerSlots = currentQ.answers.slice();
+  
+  const hasLongAnswer = currentQ.answers.some(a => a.text && a.text.length > 18);
 
   const padScore = (score) => String(score).padStart(3, '0');
 
   return (
     <div className="board-container">
-
 
       <div className="game-board-frame">
         <div className="game-board-svg"></div>
@@ -194,12 +195,14 @@ export default function Board() {
                   className={`answer-row ${isRevealed ? 'revealed' : ''} ${isJustRevealed ? 'just-revealed' : ''}`}
                 >
                   <div className="answer-row-index">{idx + 1}.</div>
-                  {isRevealed && (
+                  {isRevealed ? (
                     <>
-                      <div className="answer-row-text">{answer.text}</div>
+                      <div className={`answer-row-text ${hasLongAnswer ? 'small-text' : ''}`}>{answer.text}</div>
                       <div className="answer-row-dots"></div>
                       <div className="answer-row-points">{answer.points}</div>
                     </>
+                  ) : (
+                    <div className="answer-row-dots"></div>
                   )}
                 </div>
               );
@@ -234,6 +237,10 @@ export default function Board() {
           </div>
         </div>
       )}
+      
+      {/* Flashing light effect when scoring */}
+      {scoreAnimating.team1 && <div className="flash-overlay team1" />}
+      {scoreAnimating.team2 && <div className="flash-overlay team2" />}
     </div>
   );
 }

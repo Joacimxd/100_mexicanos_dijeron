@@ -199,8 +199,8 @@ body {
 }
 
 @keyframes revealText {
-  0% { transform: scale(0.95); opacity: 0; filter: blur(4px); }
-  100% { transform: scale(1); opacity: 1; filter: blur(0); }
+  0% { clip-path: inset(0 100% 0 0); opacity: 0.5; }
+  100% { clip-path: inset(0 0 0 0); opacity: 1; }
 }
 
 .answer-row-index {
@@ -211,6 +211,13 @@ body {
 .answer-row-text {
   text-align: left;
   white-space: nowrap;
+  max-width: 75%;
+}
+
+.answer-row-text.small-text {
+  font-size: 0.65em;
+  white-space: normal;
+  line-height: 1.1;
 }
 
 .answer-row-dots {
@@ -254,6 +261,44 @@ body {
   letter-spacing: 2px;
 }
 
+/* ─── Flashing Light Effect ────────────────────────────────────────── */
+.flash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 50;
+  background: rgba(245, 200, 66, 0.7);
+  mix-blend-mode: screen;
+  animation: flashStrobe 2s linear forwards;
+}
+
+@keyframes flashStrobe {
+  0% { opacity: 0; }
+  5% { opacity: 1; }
+  10% { opacity: 0; }
+  15% { opacity: 1; }
+  20% { opacity: 0; }
+  25% { opacity: 1; }
+  30% { opacity: 0; }
+  35% { opacity: 1; }
+  40% { opacity: 0; }
+  45% { opacity: 1; }
+  50% { opacity: 0; }
+  55% { opacity: 1; }
+  60% { opacity: 0; }
+  65% { opacity: 1; }
+  70% { opacity: 0; }
+  75% { opacity: 1; }
+  80% { opacity: 0; }
+  85% { opacity: 1; }
+  90% { opacity: 0; }
+  95% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ─── Strike Overlay ─────────────────────────────────────────────── */
 .strike-overlay {
   position: fixed;
@@ -286,9 +331,6 @@ body {
   animation: strikeSlam 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) both;
   line-height: 1;
 }
-
-.strike-x:nth-child(2) { animation-delay: 0.15s; }
-.strike-x:nth-child(3) { animation-delay: 0.3s; }
 
 @keyframes strikeSlam {
   0% {
@@ -730,15 +772,18 @@ body {
    HOME / NAVIGATOR PAGE
    ═══════════════════════════════════════════════════════════════════ */
 .home-container {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 32px 24px;
   background-image: url(/game.png);
-  background-position: center -90px;
+  background-position: center;
   background-size: cover;
+  background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
 }
@@ -849,14 +894,14 @@ body {
 }
 
 .qr-modal {
-  background: linear-gradient(135deg, var(--bg-surface), var(--bg-card));
-  border: 1px solid var(--border-glow);
-  border-radius: var(--radius-xl);
-  padding: 32px;
-  text-align: center;
-  max-width: 380px;
+  background: transparent;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 320px;
   width: 90%;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5), var(--shadow-glow-gold);
   position: relative;
   animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -872,8 +917,8 @@ body {
   right: 16px;
   background: none;
   border: none;
-  color: var(--text-muted);
-  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.5rem;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: var(--radius-sm);
@@ -881,29 +926,24 @@ body {
 }
 
 .qr-close-btn:hover {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.qr-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 20px;
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .qr-code-container {
-  background: white;
-  border-radius: var(--radius-md);
-  padding: 16px;
-  display: inline-block;
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
 }
 
 .qr-image {
   display: block;
   width: 240px;
   height: 240px;
+  filter: invert(1);
+  mix-blend-mode: screen;
 }
 
 .qr-url {
@@ -957,11 +997,6 @@ body {
     font-size: 1.6rem;
   }
 
-  .home-cards {
-    grid-template-columns: 1fr;
-    max-width: 360px;
-  }
-
   .home-card {
     padding: 24px 20px;
   }
@@ -973,5 +1008,9 @@ body {
   .qr-image {
     width: 200px;
     height: 200px;
+  }
+
+  .home-container {
+    background-image: url(/game_phones.png);
   }
 }
