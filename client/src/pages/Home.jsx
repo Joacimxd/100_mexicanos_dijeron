@@ -2,14 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function QRModal({ url, onClose }) {
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(url)}&color=000000&bgcolor=ffffff&format=svg&margin=0`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(url)}&color=1a2048&bgcolor=ffffff&format=svg&margin=8`;
 
   return (
     <div className="qr-modal-overlay" onClick={onClose}>
       <div className="qr-modal" onClick={(e) => e.stopPropagation()}>
         <button className="qr-close-btn" onClick={onClose}>✕</button>
-        <div className="qr-code-container">
-          <img src={qrUrl} alt="QR Code" className="qr-image" />
+        <div className="qr-modal-header">
+          <h3>Escanea para unirte</h3>
+        </div>
+        <div className="qr-modal-body">
+          <div className="qr-code-container">
+            <img src={qrUrl} alt="QR Code" className="qr-image" />
+          </div>
+          <div className="qr-url">{url}</div>
+          <div className="qr-hint">Escanea el código con tu celular para abrir el juego</div>
         </div>
       </div>
     </div>

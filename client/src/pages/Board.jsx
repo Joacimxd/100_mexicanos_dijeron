@@ -1,5 +1,28 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
+// ─── QR Modal ────────────────────────────────────────────────────
+function QRModal({ url, onClose }) {
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(url)}&color=1a2048&bgcolor=ffffff&format=svg&margin=8`;
+
+  return (
+    <div className="qr-modal-overlay" onClick={onClose}>
+      <div className="qr-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="qr-close-btn" onClick={onClose}>✕</button>
+        <div className="qr-modal-header">
+          <h3>Escanea para unirte</h3>
+        </div>
+        <div className="qr-modal-body">
+          <div className="qr-code-container">
+            <img src={qrUrl} alt="QR Code" className="qr-image" />
+          </div>
+          <div className="qr-url">{url}</div>
+          <div className="qr-hint">Escanea el código con tu celular para abrir el juego</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Sound Effects ───────────────────────────────────────────────
 const sounds = {
   reveal: new Audio('/reveal_answer.wav'),
@@ -76,6 +99,36 @@ export default function Board() {
   const prevQuestionIndex = useRef(0);
   const prevStrikes = useRef(0);
   const isFirstRender = useRef(true);
+
+  // QR Modal state
+  const [showQR, setShowQR] = useState(false);
+  const [qrTarget, setQrTarget] = useState('');
+  const [networkBase, setNetworkBase] = useState('');
+  const [networkLoading, setNetworkLoading] = useState(true);
+
+  // Fetch the LAN IP for QR sharing
+  useEffect(() => {
+    const host = window.location.hostname;
+    const serverUrl = `http://${host}:3001/api/network`;
+
+    fetch(serverUrl)
+      .then((res) => res.json())
+      .then((data) => {
+        setNetworkBase(`http://${data.ip}:${data.port}`);
+        setNetworkLoading(false);
+      })
+      .catch(() => {
+        const port = window.location.port;
+        const protocol = window.location.protocol;
+        setNetworkBase(`${protocol}//${host}${port ? ':' + port : ''}`);
+        setNetworkLoading(false);
+      });
+  }, []);
+
+  const handleShowQR = (path) => {
+    setQrTarget(`${networkBase}${path}`);
+    setShowQR(true);
+  };
 
   // Detect newly revealed answers → play reveal sound
   useEffect(() => {
@@ -167,6 +220,25 @@ export default function Board() {
 
   return (
     <div className="board-container">
+
+      {/* Top Right QR Button */}
+      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 10 }}>
+        <button
+          className="home-top-qr-btn"
+          style={{ position: 'static' }}
+          onClick={() => handleShowQR('/control')}
+          disabled={networkLoading}
+          title="Compartir enlace de control"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+          </svg>
+          <span>QR</span>
+        </button>
+      </div>
+
+      {/* QR Modal */}
+      {showQR && <QRModal url={qrTarget} onClose={() => setShowQR(false)} />}
 
       <div className="game-board-frame">
         <div className="game-board-svg"></div>

@@ -884,80 +884,131 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(12px);
+  background: rgba(5, 7, 20, 0.85);
+  backdrop-filter: blur(16px) saturate(1.2);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 300;
-  animation: overlayFadeIn 0.2s ease-out;
+  animation: overlayFadeIn 0.25s ease-out;
 }
 
 .qr-modal {
-  background: transparent;
-  padding: 40px;
+  background: linear-gradient(145deg, rgba(26, 32, 72, 0.95), rgba(17, 22, 56, 0.98));
+  border: 1px solid rgba(245, 200, 66, 0.25);
+  border-radius: var(--radius-xl);
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  max-width: 320px;
+  max-width: 380px;
   width: 90%;
   position: relative;
-  animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow:
+    0 0 40px rgba(245, 200, 66, 0.08),
+    0 25px 60px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  animation: qrModalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes modalSlideIn {
-  from { opacity: 0; transform: scale(0.9) translateY(20px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+@keyframes qrModalIn {
+  from { opacity: 0; transform: scale(0.85) translateY(30px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Gradient shine header */
+.qr-modal-header {
+  width: 100%;
+  padding: 20px 24px 14px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(245, 200, 66, 0.06) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(245, 200, 66, 0.1);
+}
+
+.qr-modal-header h3 {
+  font-family: var(--font-family);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin: 0;
+}
+
+.qr-modal-body {
+  padding: 28px 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
 }
 
 .qr-close-btn {
   position: absolute;
-  top: 12px;
-  right: 16px;
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 1.5rem;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  font-size: 1rem;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  transition: color 0.2s, background 0.2s;
+  transition: all 0.2s ease;
+  line-height: 1;
 }
 
 .qr-close-btn:hover {
   color: white;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: rotate(90deg);
 }
 
 .qr-code-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0;
-  padding: 0;
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow:
+    0 0 20px rgba(245, 200, 66, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .qr-image {
   display: block;
-  width: 240px;
-  height: 240px;
-  filter: invert(1);
-  mix-blend-mode: screen;
+  width: 220px;
+  height: 220px;
+  border-radius: var(--radius-md);
 }
 
 .qr-url {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--gold);
   font-family: 'Courier New', monospace;
   word-break: break-all;
-  margin-bottom: 8px;
+  text-align: center;
+  padding: 8px 14px;
+  background: rgba(245, 200, 66, 0.06);
+  border: 1px solid rgba(245, 200, 66, 0.12);
+  border-radius: var(--radius-sm);
+  width: 100%;
 }
 
 .qr-hint {
   font-size: 0.75rem;
   color: var(--text-muted);
+  text-align: center;
+  line-height: 1.4;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1006,8 +1057,20 @@ body {
   }
 
   .qr-image {
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
+  }
+
+  .qr-modal {
+    max-width: 340px;
+  }
+
+  .qr-modal-body {
+    padding: 20px 24px 20px;
+  }
+
+  .qr-code-container {
+    padding: 12px;
   }
 
   .home-container {
