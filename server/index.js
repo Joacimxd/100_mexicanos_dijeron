@@ -180,9 +180,11 @@ wss.on('connection', (ws, req) => {
         break;
       }
 
-      case 'add_strike': {
-        if (room.gameState.strikes < 3) {
-          room.gameState.strikes += 1;
+      case 'set_strikes': {
+        const amount = msg.amount || 1;
+        if (amount >= 1 && amount <= 3) {
+          room.gameState.strikes = amount;
+          room.gameState.strikeId = Date.now();
           room.gameState.showStrikes = true;
           setTimeout(() => {
             if (rooms.has(roomId)) {

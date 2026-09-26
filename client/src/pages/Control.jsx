@@ -74,8 +74,8 @@ export default function Control() {
     send({ type: 'reveal_answer', answerIndex: index });
   };
 
-  const handleStrike = () => {
-    send({ type: 'add_strike' });
+  const handleStrike = (amount) => {
+    send({ type: 'set_strikes', amount });
   };
 
   const handleClearStrikes = () => {
@@ -149,9 +149,17 @@ export default function Control() {
       {/* Action Buttons */}
       <div className="control-actions">
         {/* Strike */}
-        <button className="action-btn btn-strike" onClick={handleStrike}>
-          ✕ Strike ({gameState.strikes}/3)
-        </button>
+        <div className="action-row">
+          <button className="action-btn btn-strike" onClick={() => handleStrike(1)}>
+            ✕ 1 Strike
+          </button>
+          <button className="action-btn btn-strike" onClick={() => handleStrike(2)}>
+            ✕ 2 Strikes
+          </button>
+          <button className="action-btn btn-strike" onClick={() => handleStrike(3)}>
+            ✕ 3 Strikes
+          </button>
+        </div>
 
         {gameState.strikes > 0 && (
           <button

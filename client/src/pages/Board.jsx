@@ -187,11 +187,11 @@ export default function Board() {
   useEffect(() => {
     if (!gameState) return;
 
-    if (gameState.showStrikes && gameState.strikes > prevStrikes.current) {
+    if (gameState.showStrikes && gameState.strikeId && gameState.strikeId !== prevStrikes.current) {
       playSound(sounds.strike);
+      prevStrikes.current = gameState.strikeId;
     }
-    prevStrikes.current = gameState.strikes;
-  }, [gameState?.strikes, gameState?.showStrikes]);
+  }, [gameState?.strikeId, gameState?.showStrikes]);
 
   // Mark first render done after initial state
   useEffect(() => {
