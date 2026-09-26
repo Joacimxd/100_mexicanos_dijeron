@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { getWsUrl } from '../config';
 
 function useControlWebSocket() {
   const [gameState, setGameState] = useState(null);
@@ -7,9 +8,7 @@ function useControlWebSocket() {
   const reconnectTimeout = useRef(null);
 
   const connect = useCallback(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.hostname;
-    const wsUrl = `${protocol}//${host}:3001`;
+    const wsUrl = getWsUrl();
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;

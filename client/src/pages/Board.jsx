@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { getServerUrl, getWsUrl } from '../config';
 
 // ─── QR Modal ────────────────────────────────────────────────────
 function QRModal({ url, onClose }) {
@@ -50,10 +51,8 @@ function useWebSocket() {
   const reconnectTimeout = useRef(null);
 
   const connect = useCallback(() => {
-    // Connect to the WebSocket server (via Vite proxy or direct)
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.hostname;
-    const wsUrl = `${protocol}//${host}:3001`;
+    // Connect to the WebSocket server
+    const wsUrl = getWsUrl();
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
@@ -108,19 +107,20 @@ export default function Board() {
 
   // Fetch the LAN IP for QR sharing
   useEffect(() => {
-    const host = window.location.hostname;
-    const serverUrl = `http://${host}:3001/api/network`;
+    const serverUrl = `${getServerUrl()}/api/network`;
 
     fetch(serverUrl)
       .then((res) => res.json())
       .then((data) => {
-        setNetworkBase(`http://${data.ip}:${data.port}`);
+        if (import.meta.env.VITE_BACKEND_URL) {
+           setNetworkBase(window.location.origin);
+        } else {
+           setNetworkBase(`http://${data.ip}:${data.port}`);
+        }
         setNetworkLoading(false);
       })
       .catch(() => {
-        const port = window.location.port;
-        const protocol = window.location.protocol;
-        setNetworkBase(`${protocol}//${host}${port ? ':' + port : ''}`);
+        setNetworkBase(window.location.origin);
         setNetworkLoading(false);
       });
   }, []);

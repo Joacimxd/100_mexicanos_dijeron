@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getServerUrl } from '../config';
 
 function QRModal({ url, onClose }) {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=${encodeURIComponent(url)}&color=1a2048&bgcolor=ffffff&format=svg&margin=8`;
@@ -54,20 +55,22 @@ export default function Home() {
 
   // Fetch the actual LAN IP from the server
   useEffect(() => {
-    const host = window.location.hostname;
-    const serverUrl = `http://${host}:3001/api/network`;
+    const serverUrl = `${getServerUrl()}/api/network`;
 
     fetch(serverUrl)
       .then((res) => res.json())
       .then((data) => {
-        setNetworkBase(`http://${data.ip}:${data.port}`);
+        // If VITE_BACKEND_URL is set, we are likely online, so just use current domain for QR code
+        if (import.meta.env.VITE_BACKEND_URL) {
+           setNetworkBase(window.location.origin);
+        } else {
+           setNetworkBase(`http://${data.ip}:${data.port}`);
+        }
         setLoading(false);
       })
       .catch(() => {
         // Fallback to current window location
-        const port = window.location.port;
-        const protocol = window.location.protocol;
-        setNetworkBase(`${protocol}//${host}${port ? ':' + port : ''}`);
+        setNetworkBase(window.location.origin);
         setLoading(false);
       });
   }, []);
