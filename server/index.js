@@ -16,19 +16,28 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
 
-// ─── Load Questions ──────────────────────────────────────────────
-const questionsData = JSON.parse(
+// ─── Default Questions ───────────────────────────────────────────
+const defaultQuestionsData = JSON.parse(
   readFileSync(join(__dirname, 'data', 'questions.json'), 'utf-8')
 );
-const questions = questionsData.questions;
+const defaultQuestions = defaultQuestionsData.questions;
 
-// ─── Game State ──────────────────────────────────────────────────
-let gameState = createInitialState();
+// ─── Room State Management ───────────────────────────────────────
+const rooms = new Map();
 
-function createInitialState() {
+function generateRoomId() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let result = '';
+  for (let i = 0; i < 4; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+function createInitialState(questionsArray) {
   return {
     currentQuestionIndex: 0,
-    questions: questions.map((q) => ({
+    questions: questionsArray.map((q) => ({
       question: q.question,
       totalAnswers: q.answers.length,
       answers: q.answers.map((a) => ({
@@ -43,29 +52,63 @@ function createInitialState() {
     showStrikes: false,
     roundPoints: 0,
     multiplier: 1,
-    totalQuestions: questions.length,
+    totalQuestions: questionsArray.length,
     gameOver: false,
   };
 }
 
-function getCurrentQuestion() {
-  return gameState.questions[gameState.currentQuestionIndex];
+function getCurrentQuestion(room) {
+  return room.gameState.questions[room.gameState.currentQuestionIndex];
 }
 
-function recalcRoundPoints() {
-  const q = getCurrentQuestion();
-  gameState.roundPoints = q.answers
+function recalcRoundPoints(room) {
+  const q = getCurrentQuestion(room);
+  room.gameState.roundPoints = q.answers
     .filter((a) => a.revealed)
     .reduce((sum, a) => sum + a.points, 0);
 }
 
 // ─── REST Endpoints ──────────────────────────────────────────────
-app.get('/api/state', (req, res) => {
-  res.json(gameState);
+app.post('/api/rooms', (req, res) => {
+  let customQuestions = req.body.questions;
+  
+  // Basic validation if custom questions are provided
+  if (customQuestions) {
+    if (!Array.isArray(customQuestions) || customQuestions.length === 0) {
+      return res.status(400).json({ error: 'Invalid questions format' });
+    }
+  } else {
+    customQuestions = defaultQuestions;
+  }
+
+  let roomId;
+  do {
+    roomId = generateRoomId();
+  } while (rooms.has(roomId));
+
+  const newRoom = {
+    id: roomId,
+    gameState: createInitialState(customQuestions),
+    clients: new Set(),
+    originalQuestions: customQuestions,
+  };
+
+  rooms.set(roomId, newRoom);
+  
+  // Cleanup old empty rooms occasionally
+  if (rooms.size > 100) {
+     for (const [id, room] of rooms.entries()) {
+        if (room.clients.size === 0) rooms.delete(id);
+     }
+  }
+
+  res.json({ roomId });
 });
 
-app.get('/api/questions', (req, res) => {
-  res.json(questions);
+app.get('/api/state/:roomId', (req, res) => {
+  const room = rooms.get(req.params.roomId);
+  if (!room) return res.status(404).json({ error: 'Room not found' });
+  res.json(room.gameState);
 });
 
 app.get('/api/network', (req, res) => {
@@ -73,9 +116,7 @@ app.get('/api/network', (req, res) => {
   let lanIp = null;
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
-      // Skip internal and non-IPv4
       if (!net.internal && net.family === 'IPv4') {
-        // Prefer 192.168.x.x addresses
         if (net.address.startsWith('192.168')) {
           lanIp = net.address;
           break;
@@ -92,23 +133,31 @@ app.get('/api/network', (req, res) => {
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
-const clients = new Set();
-
-function broadcast() {
-  const data = JSON.stringify({ type: 'state_update', payload: gameState });
-  for (const ws of clients) {
+function broadcast(room) {
+  const data = JSON.stringify({ type: 'state_update', payload: room.gameState });
+  for (const ws of room.clients) {
     if (ws.readyState === ws.OPEN) {
       ws.send(data);
     }
   }
 }
 
-wss.on('connection', (ws) => {
-  clients.add(ws);
-  console.log(`Client connected. Total: ${clients.size}`);
+wss.on('connection', (ws, req) => {
+  // Extract roomId from URL query, e.g. /?room=ABCD
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  const roomId = url.searchParams.get('room');
+
+  if (!roomId || !rooms.has(roomId)) {
+    ws.close(1008, 'Invalid Room ID');
+    return;
+  }
+
+  const room = rooms.get(roomId);
+  room.clients.add(ws);
+  console.log(`Client connected to room ${roomId}. Room clients: ${room.clients.size}`);
 
   // Send current state immediately on connect
-  ws.send(JSON.stringify({ type: 'state_update', payload: gameState }));
+  ws.send(JSON.stringify({ type: 'state_update', payload: room.gameState }));
 
   ws.on('message', (raw) => {
     let msg;
@@ -120,55 +169,54 @@ wss.on('connection', (ws) => {
 
     switch (msg.type) {
       case 'reveal_answer': {
-        const q = getCurrentQuestion();
+        const q = getCurrentQuestion(room);
         const idx = msg.answerIndex;
         if (idx >= 0 && idx < q.answers.length && !q.answers[idx].revealed) {
           q.answers[idx].revealed = true;
-          recalcRoundPoints();
-          // Clear any active strikes when revealing
-          gameState.showStrikes = false;
-          gameState.strikes = 0;
+          recalcRoundPoints(room);
+          room.gameState.showStrikes = false;
+          room.gameState.strikes = 0;
         }
         break;
       }
 
       case 'add_strike': {
-        if (gameState.strikes < 3) {
-          gameState.strikes += 1;
-          gameState.showStrikes = true;
-          // Auto-hide strikes after 2 seconds
+        if (room.gameState.strikes < 3) {
+          room.gameState.strikes += 1;
+          room.gameState.showStrikes = true;
           setTimeout(() => {
-            gameState.showStrikes = false;
-            broadcast();
+            if (rooms.has(roomId)) {
+               room.gameState.showStrikes = false;
+               broadcast(room);
+            }
           }, 2000);
         }
         break;
       }
 
       case 'clear_strikes': {
-        gameState.strikes = 0;
-        gameState.showStrikes = false;
+        room.gameState.strikes = 0;
+        room.gameState.showStrikes = false;
         break;
       }
 
       case 'award_points': {
-        const team = msg.team; // 'team1' or 'team2'
+        const team = msg.team;
         if (team === 'team1' || team === 'team2') {
-          gameState.scores[team] += gameState.roundPoints * gameState.multiplier;
-          // After awarding, move to next or end
+          room.gameState.scores[team] += room.gameState.roundPoints * room.gameState.multiplier;
         }
         break;
       }
 
       case 'next_question': {
-        if (gameState.currentQuestionIndex < gameState.totalQuestions - 1) {
-          gameState.currentQuestionIndex += 1;
-          gameState.strikes = 0;
-          gameState.showStrikes = false;
-          gameState.roundPoints = 0;
-          gameState.multiplier = 1;
+        if (room.gameState.currentQuestionIndex < room.gameState.totalQuestions - 1) {
+          room.gameState.currentQuestionIndex += 1;
+          room.gameState.strikes = 0;
+          room.gameState.showStrikes = false;
+          room.gameState.roundPoints = 0;
+          room.gameState.multiplier = 1;
         } else {
-          gameState.gameOver = true;
+          room.gameState.gameOver = true;
         }
         break;
       }
@@ -176,7 +224,7 @@ wss.on('connection', (ws) => {
       case 'set_multiplier': {
         const m = parseInt(msg.value, 10);
         if (m >= 1 && m <= 4) {
-          gameState.multiplier = m;
+          room.gameState.multiplier = m;
         }
         break;
       }
@@ -184,13 +232,13 @@ wss.on('connection', (ws) => {
       case 'set_team_name': {
         const team = msg.team;
         if ((team === 'team1' || team === 'team2') && msg.name) {
-          gameState.teamNames[team] = msg.name;
+          room.gameState.teamNames[team] = msg.name;
         }
         break;
       }
 
       case 'reset_game': {
-        gameState = createInitialState();
+        room.gameState = createInitialState(room.originalQuestions);
         break;
       }
 
@@ -198,19 +246,16 @@ wss.on('connection', (ws) => {
         console.log('Unknown message type:', msg.type);
     }
 
-    broadcast();
+    broadcast(room);
   });
 
   ws.on('close', () => {
-    clients.delete(ws);
-    console.log(`Client disconnected. Total: ${clients.size}`);
+    room.clients.delete(ws);
+    console.log(`Client disconnected from room ${roomId}. Room clients: ${room.clients.size}`);
   });
 });
 
 // ─── Start ───────────────────────────────────────────────────────
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`\n🎮 100 Mexicanos Dijeron — Server running`);
-  console.log(`   REST API:   http://localhost:${PORT}/api/state`);
-  console.log(`   WebSocket:  ws://localhost:${PORT}`);
-  console.log(`   Ready for connections!\n`);
+  console.log(`\n🎮 100 Mexicanos Dijeron — Server running on port ${PORT}`);
 });

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
 import { getServerUrl, getWsUrl } from '../config';
 
 // ─── QR Modal ────────────────────────────────────────────────────
@@ -45,14 +46,14 @@ function playSound(sound) {
 }
 
 // ─── WebSocket Hook ──────────────────────────────────────────────
-function useWebSocket() {
+function useWebSocket(roomId) {
   const [gameState, setGameState] = useState(null);
   const wsRef = useRef(null);
   const reconnectTimeout = useRef(null);
 
   const connect = useCallback(() => {
     // Connect to the WebSocket server
-    const wsUrl = getWsUrl();
+    const wsUrl = `${getWsUrl()}?room=${roomId}`;
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
@@ -90,7 +91,8 @@ function useWebSocket() {
 }
 
 export default function Board() {
-  const gameState = useWebSocket();
+  const { roomId } = useParams();
+  const gameState = useWebSocket(roomId);
   const [prevScores, setPrevScores] = useState({ team1: 0, team2: 0 });
   const [scoreAnimating, setScoreAnimating] = useState({ team1: false, team2: false });
   const [justRevealed, setJustRevealed] = useState(new Set());
@@ -222,11 +224,14 @@ export default function Board() {
     <div className="board-container">
 
       {/* Top Right QR Button */}
-      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 10 }}>
+      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+        <div style={{ background: 'rgba(0,0,0,0.7)', padding: '0.5rem 1rem', borderRadius: '8px', color: '#ffcb00', fontWeight: 'bold', fontSize: '1.2rem', letterSpacing: '2px' }}>
+          SALA: {roomId}
+        </div>
         <button
           className="home-top-qr-btn"
           style={{ position: 'static' }}
-          onClick={() => handleShowQR('/control')}
+          onClick={() => handleShowQR(`/control/${roomId}`)}
           disabled={networkLoading}
           title="Compartir enlace de control"
         >

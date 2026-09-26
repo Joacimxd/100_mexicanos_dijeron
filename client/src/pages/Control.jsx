@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
 import { getWsUrl } from '../config';
 
-function useControlWebSocket() {
+function useControlWebSocket(roomId) {
   const [gameState, setGameState] = useState(null);
   const [connected, setConnected] = useState(false);
   const wsRef = useRef(null);
   const reconnectTimeout = useRef(null);
 
   const connect = useCallback(() => {
-    const wsUrl = getWsUrl();
+    const wsUrl = `${getWsUrl()}?room=${roomId}`;
 
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
@@ -54,7 +55,8 @@ function useControlWebSocket() {
 }
 
 export default function Control() {
-  const { gameState, connected, send } = useControlWebSocket();
+  const { roomId } = useParams();
+  const { gameState, connected, send } = useControlWebSocket(roomId);
   const [confirmReset, setConfirmReset] = useState(false);
 
   if (!gameState) {

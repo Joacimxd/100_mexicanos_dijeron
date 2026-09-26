@@ -9,8 +9,8 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/board" element={<Board />} />
-        <Route path="/control" element={<Control />} />
+        <Route path="/board/:roomId" element={<Board />} />
+        <Route path="/control/:roomId" element={<Control />} />
       </Routes>
     </BrowserRouter>
   );
