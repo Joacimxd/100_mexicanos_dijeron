@@ -104,7 +104,7 @@ export default function Board() {
   // QR Modal state
   const [showQR, setShowQR] = useState(false);
   const [qrTarget, setQrTarget] = useState('');
-  const [networkBase, setNetworkBase] = useState('');
+  const [networkIp, setNetworkIp] = useState('');
   const [networkLoading, setNetworkLoading] = useState(true);
 
   // Fetch the LAN IP for QR sharing
@@ -114,21 +114,20 @@ export default function Board() {
     fetch(serverUrl)
       .then((res) => res.json())
       .then((data) => {
-        let base = window.location.origin;
-        if (base.includes('localhost') || base.includes('127.0.0.1')) {
-           base = base.replace('localhost', data.ip).replace('127.0.0.1', data.ip);
-        }
-        setNetworkBase(base);
+        setNetworkIp(data.ip);
         setNetworkLoading(false);
       })
       .catch(() => {
-        setNetworkBase(window.location.origin);
         setNetworkLoading(false);
       });
   }, []);
 
-  const handleShowQR = (path) => {
-    setQrTarget(`${networkBase}${path}`);
+  const handleShowQR = () => {
+    let url = window.location.href.replace('/board/', '/control/');
+    if (networkIp && (url.includes('localhost') || url.includes('127.0.0.1'))) {
+       url = url.replace('localhost', networkIp).replace('127.0.0.1', networkIp);
+    }
+    setQrTarget(url);
     setShowQR(true);
   };
 
@@ -231,7 +230,7 @@ export default function Board() {
         <button
           className="home-top-qr-btn"
           style={{ position: 'static', background: '#ffcb00', color: '#000', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontWeight: 'bold' }}
-          onClick={() => handleShowQR(`/control/${roomId}`)}
+          onClick={handleShowQR}
           disabled={networkLoading}
           title="Compartir enlace de control"
         >
