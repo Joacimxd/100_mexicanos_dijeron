@@ -114,11 +114,11 @@ export default function Board() {
     fetch(serverUrl)
       .then((res) => res.json())
       .then((data) => {
-        if (import.meta.env.VITE_BACKEND_URL) {
-           setNetworkBase(window.location.origin);
-        } else {
-           setNetworkBase(`http://${data.ip}:${data.port}`);
+        let base = window.location.origin;
+        if (base.includes('localhost') || base.includes('127.0.0.1')) {
+           base = base.replace('localhost', data.ip).replace('127.0.0.1', data.ip);
         }
+        setNetworkBase(base);
         setNetworkLoading(false);
       })
       .catch(() => {
@@ -224,21 +224,21 @@ export default function Board() {
     <div className="board-container">
 
       {/* Top Right QR Button */}
-      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-        <div style={{ background: 'rgba(0,0,0,0.7)', padding: '0.5rem 1rem', borderRadius: '8px', color: '#ffcb00', fontWeight: 'bold', fontSize: '1.2rem', letterSpacing: '2px' }}>
+      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.7)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,203,0,0.3)' }}>
+        <div style={{ color: '#ffcb00', fontWeight: 'bold', fontSize: '1.5rem', letterSpacing: '2px' }}>
           SALA: {roomId}
         </div>
         <button
           className="home-top-qr-btn"
-          style={{ position: 'static' }}
+          style={{ position: 'static', background: '#ffcb00', color: '#000', border: 'none', borderRadius: '8px', padding: '0.5rem 1rem', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontWeight: 'bold' }}
           onClick={() => handleShowQR(`/control/${roomId}`)}
           disabled={networkLoading}
           title="Compartir enlace de control"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '20px', height: '20px' }}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
           </svg>
-          <span>QR</span>
+          <span>MOSTRAR QR</span>
         </button>
       </div>
 
@@ -252,11 +252,13 @@ export default function Board() {
           <div className="ear-score">{padScore(gameState.roundPoints)}</div>
         </div>
 
-        <div className="board-left-ear">
+        <div className="board-left-ear" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ fontSize: '1.3rem', color: '#ffcb00', fontWeight: 'bold', textTransform: 'uppercase', textShadow: '2px 2px 0 #000', marginBottom: '-5px', zIndex: 2 }}>{gameState.teamNames?.team1 || 'Equipo 1'}</div>
           <div className="ear-score">{padScore(gameState.scores.team1)}</div>
         </div>
 
-        <div className="board-right-ear">
+        <div className="board-right-ear" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ fontSize: '1.3rem', color: '#ffcb00', fontWeight: 'bold', textTransform: 'uppercase', textShadow: '2px 2px 0 #000', marginBottom: '-5px', zIndex: 2 }}>{gameState.teamNames?.team2 || 'Equipo 2'}</div>
           <div className="ear-score">{padScore(gameState.scores.team2)}</div>
         </div>
 

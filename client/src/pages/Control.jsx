@@ -161,16 +161,6 @@ export default function Control() {
           </button>
         </div>
 
-        {gameState.strikes > 0 && (
-          <button
-            className="action-btn btn-next"
-            onClick={handleClearStrikes}
-            style={{ fontSize: '0.85rem' }}
-          >
-            Quitar Strikes
-          </button>
-        )}
-
         {/* Award Points */}
         <div className="action-row">
           <button
